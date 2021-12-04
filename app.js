@@ -1,33 +1,61 @@
 import { input2 } from "./input2.js";
 
+
+let testSetArray = [
+  "forward 6",
+  "forward 8",
+  "down 6",
+  "down 6",
+  "forward 9",
+  "down 7",
+  "down 3",
+  "forward 4",
+  "forward 7",
+  "up 3",
+  "forward 9",
+  "up 4",
+];
+
 // Starting at 0,0,0
 let directions = {
-  up: [],
-  down: [],
-  forward: []
+  up: 0,
+  down: 0,
+  forward: 0,
+  aim : 0
 };
+
+let heading = {
+    position : 0,
+    depth : 0
+}
 
 // main logic loop
 input2.forEach((directive) => {
   let tupleDirective = tuple(directive);
-  directions[parseDirection(tupleDirective)].push(
-    parseDistance(tupleDirective)
-  );
+  moveBy(tupleDirective, directions, heading);
 });
 
-let finalForward = sum(directions["forward"]);
-let finalDepth = difference(sum(directions["up"]), sum(directions["down"]));
-
 console.log("[--------------]");
-console.log(`> up: ${sum(directions["up"])}`);
-console.log(`> down: ${sum(directions["down"])}`);
-console.log(`> forward: ${sum(directions["forward"])}`);
-console.log(
-  `> U/D diff: ${difference(sum(directions["up"]), sum(directions["down"]))}`
-);
-console.log(`Answer: ${finalForward * finalDepth}`)
-
+console.log(`heading: ${heading.position} : ${heading.depth}`);
 console.log("[--------------]");
+
+// Helpers
+function moveBy (tupleInput, dirInput, currentPosition) {
+    switch (tupleInput[0]){
+        case "up":
+            dirInput["aim"] -= Number(tupleInput[1]);
+            break;
+        case "down":
+            dirInput["aim"] += Number(tupleInput[1]);
+            break;
+        case "forward":
+            currentPosition['position'] += Number(tupleInput[1]);
+            currentPosition['depth'] += (dirInput["aim"] * tupleInput[1]);
+            break;
+        default:
+            console.log("something has gone wrong...");
+    }
+}
 
 function sum(inputArray) {
   return inputArray.reduce((previousValue, currentValue) => {
