@@ -1,86 +1,76 @@
-import { input2 } from "./input2.js";
+import { input3 } from "./input3.js";
 
-
-let testSetArray = [
-  "forward 6",
-  "forward 8",
-  "down 6",
-  "down 6",
-  "forward 9",
-  "down 7",
-  "down 3",
-  "forward 4",
-  "forward 7",
-  "up 3",
-  "forward 9",
-  "up 4",
+let matrix = [
+  [],
+  [],
+  [],
+  [], 
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  []
 ];
 
-// Starting at 0,0,0
-let directions = {
-  up: 0,
-  down: 0,
-  forward: 0,
-  aim : 0
+
+input3.forEach(input =>{
+  let inputArray = splitIndex(input);
+  inputArray.forEach((bitString, index) => {
+    matrix[index].push(bitString)
+  });
+});
+let GAMMA = "";
+let EPSILON = "";
+matrix.forEach((matrixArray, index) => {
+  let gammaValue = calcGamma(matrixArray)[0][0];
+  let epsilonValue = calcEpsilon(matrixArray)[0][0];
+  // console.log(`${index} : Gamma - ${gammaValue}`);
+  // console.log(`${index} : Epsilon - ${epsilonValue}`);
+  GAMMA += gammaValue;
+  EPSILON += epsilonValue;
+});
+console.log(`GAMMA: ${parseInt(GAMMA, 2)}`);
+console.log(`EPSILON: ${parseInt(EPSILON, 2)}`);
+console.log("---------------")
+console.log(`ANSWER: ${parseInt(GAMMA, 2) * parseInt(EPSILON, 2)}`);
+
+function splitIndex(inputString) {
+  return inputString.split("");
 };
 
-let heading = {
-    position : 0,
-    depth : 0
+function calcGamma(inputArray) {
+  // Most common bit is returned
+  let countedBits = countBits(inputArray);
+  let tuples = Object.entries(countedBits);
+  let bigger;
+  if (tuples[0][1] > tuples[1][1]) {
+    bigger = tuples[0];
+  } else {
+    bigger = tuples[1];
+  }
+  return bigger;
 }
 
-// main logic loop
-input2.forEach((directive) => {
-  let tupleDirective = tuple(directive);
-  moveBy(tupleDirective, directions, heading);
-});
-
-console.log("[--------------]");
-console.log(`heading: ${heading.position} : ${heading.depth}`);
-console.log("[--------------]");
-
-// Helpers
-function moveBy (tupleInput, dirInput, currentPosition) {
-    switch (tupleInput[0]){
-        case "up":
-            dirInput["aim"] -= Number(tupleInput[1]);
-            break;
-        case "down":
-            dirInput["aim"] += Number(tupleInput[1]);
-            break;
-        case "forward":
-            currentPosition['position'] += Number(tupleInput[1]);
-            currentPosition['depth'] += (dirInput["aim"] * tupleInput[1]);
-            break;
-        default:
-            console.log("something has gone wrong...");
-    }
+function calcEpsilon(inputArray) {
+  // Least Common bit is returned
+  let countedBits = countBits(inputArray);
+  let tuple = Object.entries(countedBits);
+  let smaller;
+  if (tuple[0][1] < tuple[1][1]) {
+    smaller = tuple[0];
+  } else {
+    smaller = tuple[1];
+  }
+  return smaller;
 }
 
-function sum(inputArray) {
-  return inputArray.reduce((previousValue, currentValue) => {
-    let previous = Number(previousValue);
-    let current = Number(currentValue);
-    return previous + current;
+function countBits(inputArray){
+  let resultObj = {};
+  inputArray.forEach((bit) => {
+    resultObj[bit] ? (resultObj[bit] += 1) : (resultObj[bit] = 1);
   });
-}
-
-function difference(firstinput, secondinput) {
-  return firstinput > secondinput
-    ? firstinput - secondinput
-    : secondinput - firstinput;
-}
-
-function tuple(inputString) {
-  return inputString.split(" ");
-}
-
-function parseDirection(inputTuple) {
-  // Tuple is Array in the format [direction, distance]
-  return inputTuple[0];
-}
-
-function parseDistance(inputTuple) {
-  // Tuple is Array in the format [direction, distance]
-  return inputTuple[1];
+  return resultObj;
 }
